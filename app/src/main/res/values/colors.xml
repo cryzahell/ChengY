@@ -3,4 +3,8 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="colorUnderLine">#66000000</color>
+    <color name="colorFontGreen">#58bdc0</color>
+    <color name="colorFontGray">#666666</color>
+    <color name="colorPressGray">#33666666</color>
 </resources>
