@@ -63,7 +63,7 @@ public class Launcher {
     private String checkParams() throws IllegalAccessException {
         Field[] fields = this.getClass().getDeclaredFields();
         for (Field field : fields) {
-            if (field.isAnnotationPresent(OX_ParamForce.class)) {
+            if (field.isAnnotationPresent(ParamForce.class)) {
                 field.setAccessible(true);
                 String missParam = "";
                 missParam = (String) field.get(missParam);
