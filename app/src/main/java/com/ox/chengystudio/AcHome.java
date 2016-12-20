@@ -1,9 +1,10 @@
 package com.ox.chengystudio;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class AcHome extends AppCompatActivity {
+import com.ox.mylibrary.base.BaseActivity;
+
+public class AcHome extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
