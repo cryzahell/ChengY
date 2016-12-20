@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.ox.chengystudio.AcHome">
+    tools:context="com.ox.chengystudio.activity.AcHome">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,29 +12,36 @@
         android:orientation="vertical">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
+            android:gravity="center_horizontal"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
             android:layout_marginTop="15dp"
             android:text="@string/welcome_to_cheng_s_work_space"
             android:textColor="@color/colorFontGreen"
-            android:textSize="@dimen/text_size_title"
+            android:textSize="@dimen/font_size_title"
             android:textStyle="bold|italic" />
 
         <View style="@style/Style.Underline.LRMargin15" />
 
-        <Button
-            android:id="@+id/btn_activity_launcher"
-            style="@style/Style.HomeButton"
-            android:layout_marginTop="10dp"
-            android:text="Activity Launcher"
-            android:textColor="@color/colorFontGray" />
+        <!--activity launcher-->
+        <include
+            layout="@layout/ac_home_activity_launcher"/>
 
+        <!--double progress bar-->
         <Button
             android:id="@+id/btn_double_progress_bar"
             style="@style/Style.HomeButton"
             android:text="Double Progress Bar"
             android:textColor="@color/colorFontGray" />
+
+        <!--天刀画画时辰助手-->
+        <Button
+            android:id="@+id/btn_draw_helper"
+            style="@style/Style.HomeButton"
+            android:text="天刀画画时辰助手"
+            android:textColor="@color/colorFontGray" />
+
     </LinearLayout>
 
 </ScrollView>

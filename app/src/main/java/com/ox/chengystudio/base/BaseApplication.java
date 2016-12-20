@@ -1,4 +1,4 @@
-package com.ox.mylibrary.base;
+package com.ox.chengystudio.base;
 
 import android.app.Application;
 
