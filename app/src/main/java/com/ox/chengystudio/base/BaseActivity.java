@@ -1,11 +1,10 @@
 package com.ox.chengystudio.base;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import com.ox.mylibrary.util.ManageAcAnim;
+import butterknife.ButterKnife;
 
 /**
  * Created by admin on 2016/12/20.
@@ -20,18 +19,15 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         baseActivity = this;
         initView(savedInstanceState);
-
+        ButterKnife.inject(this);
         initData(savedInstanceState);
         initOther(savedInstanceState);
     }
 
     protected abstract void initView(Bundle savedInstanceState);
+
     protected abstract void initData(Bundle savedInstanceState);
+
     protected abstract void initOther(Bundle savedInstanceState);
 
-    @Override
-    public void startActivity(Intent intent) {
-        super.startActivity(intent);
-        ManageAcAnim.leftInRightOut(this);
-    }
 }

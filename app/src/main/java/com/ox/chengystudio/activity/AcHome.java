@@ -1,41 +1,71 @@
 package com.ox.chengystudio.activity;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.CheckBox;
 
 import com.ox.chengystudio.R;
-import com.ox.greendao.DaoMaster;
-import com.ox.greendao.DaoSession;
-import com.ox.greendao.Hua;
-import com.ox.greendao.HuaDao;
-import com.ox.mylibrary.base.BaseActivity;
-import com.ox.mylibrary.util.CollectionUtil;
+import com.ox.chengystudio.base.BaseActivity;
+import com.ox.chengystudio.entity.TestEntity;
+import com.ox.mylibrary.util.UtilMessage;
 
-import java.util.List;
+import butterknife.InjectView;
+import butterknife.OnClick;
 
 public class AcHome extends BaseActivity {
+//
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_ac_home);
+//
+////        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "hua-db");
+////        SQLiteDatabase db = helper.getWritableDatabase();
+////        DaoMaster master = new DaoMaster(db);
+////        DaoSession session = master.newSession();
+////
+////        HuaDao huaDao = session.getHuaDao();
+////
+////        List<Hua> huaList = huaDao.loadAll();
+//
+//    }
+
+    @InjectView(R.id.cb_launch_param_full)
+    CheckBox cbParamFull;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_act_home);
+    protected void initView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_ac_home);
+    }
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "hua-db");
-        SQLiteDatabase db = helper.getWritableDatabase();
-        DaoMaster master = new DaoMaster(db);
-        DaoSession session = master.newSession();
-
-        HuaDao huaDao = session.getHuaDao();
-
-        List<Hua> huaList = huaDao.loadAll();
-
-//        if (!CollectionUtil.isEmpty(huaList)) {
-//            for (Hua hua : huaList) {
-////                System.out.println("www." + hua.getName() + ".com");
-////                System.out.println("www." + hua.getHasDrawn() + ".com");
-//                System.out.println("www." + hua.getId() + ".com");
-//            }
-//        }
+    @Override
+    protected void initData(Bundle savedInstanceState) {
 
     }
+
+    @Override
+    protected void initOther(Bundle savedInstanceState) {
+
+    }
+
+    @OnClick({R.id.btn_activity_launcher})
+    void clickAcLauncher() {
+        AcLaunchTest.PreLauncher preLauncher = new AcLaunchTest.PreLauncher(this);
+        preLauncher.test1(1).test2("2");
+        if (cbParamFull.isChecked()) {
+            preLauncher.test3(new TestEntity());
+        }
+        preLauncher.start();
+    }
+
+    @OnClick(R.id.btn_double_progress_bar)
+    void clickDbProgressBar(View view) {
+        UtilMessage.showToast(this, "clickDbProgressBar");
+    }
+
+    @OnClick(R.id.btn_draw_helper)
+    void clickDrawHelper(View view) {
+        UtilMessage.showToast(this, "clickDrawHelper");
+    }
+
 }

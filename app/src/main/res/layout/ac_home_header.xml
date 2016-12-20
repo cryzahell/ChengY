@@ -3,4 +3,17 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:gravity="center_horizontal"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:text="@string/welcome_to_cheng_s_work_space"
+        android:textColor="@color/colorFontGreen"
+        android:textSize="@dimen/font_size_title"
+        android:textStyle="bold|italic" />
+
+    <View style="@style/Style.Underline.LRMargin15" />
+
 </LinearLayout>
