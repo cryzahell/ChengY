@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import com.ox.mylibrary.util.ManageAcAnim;
+import com.ox.mylibrary.util.ManageLog;
+
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 
@@ -15,41 +18,60 @@ public class Launcher {
     protected final Intent intent;
     protected final Activity activity;
 
+    private AcAnimListener defaultAnimListener = new AcAnimListener() {
+        @Override
+        public void override() {
+            ManageAcAnim.fadeInFadeOut(activity);
+        }
+    };
+
     public Launcher(Activity activity, Class<? extends Activity> clz) {
         intent = new Intent(activity, clz);
         this.activity = activity;
     }
 
-    /**
-     * start activity
-     */
     public void start() {
         startActivity(false, 0);
+        overridePendingTransition(null);
     }
 
-    /**
-     * start activity for result
-     *
-     * @param reqCode request code
-     */
+    public void start(AcAnimListener animListener) {
+        startActivity(false, 0);
+        overridePendingTransition(animListener);
+    }
+
     public void startForResult(int reqCode) {
         startActivity(true, reqCode);
+        overridePendingTransition(null);
+    }
+
+    public void startForResult(int reqCode, AcAnimListener animListener) {
+        startActivity(true, reqCode);
+        overridePendingTransition(animListener);
     }
 
     private void startActivity(boolean isForResult, int reqCode) {
         try {
-            String missParam = checkParams();
-            if (TextUtils.isEmpty(missParam)) {
+            String missParamName = checkParams();
+            if (TextUtils.isEmpty(missParamName)) {
                 if (isForResult) {
                     activity.startActivity(intent);
                 } else {
                     activity.startActivityForResult(intent, reqCode);
                 }
             } else {
-                throwParamException(this.getClass().getName(), missParam);
+                throwParamException(this.getClass().getName(), missParamName);
             }
         } catch (IllegalAccessException | LaunchParamException e) {
-            e.printStackTrace();
+            ManageLog.e(e);
+        }
+    }
+
+    private void overridePendingTransition(AcAnimListener animListener) {
+        if (animListener != null) {
+            animListener.override();
+        } else {
+            defaultAnimListener.override();
         }
     }
 
@@ -68,20 +90,24 @@ public class Launcher {
                 String missParam = "";
                 missParam = (String) field.get(missParam);
                 if (!intent.hasExtra(missParam)) {
-                    return missParam;
+                    return field.getName();
                 }
             }
         }
         return "";
     }
 
-    private void throwParamException(String activityName, String missParam) throws LaunchParamException {
+    private void throwParamException(String activityName, String missParamName) throws LaunchParamException {
         throw new LaunchParamException(
                 MessageFormat.format(
                         "{0} activity 启动异常： 请传入参数 {1}",
-                        activityName, missParam
+                        activityName, missParamName
                 )
         );
+    }
+
+    public interface AcAnimListener {
+        void override();
     }
 
 }
