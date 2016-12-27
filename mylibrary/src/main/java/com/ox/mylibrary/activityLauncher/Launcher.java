@@ -55,9 +55,9 @@ public class Launcher {
             String missParamName = checkParams();
             if (TextUtils.isEmpty(missParamName)) {
                 if (isForResult) {
-                    activity.startActivity(intent);
-                } else {
                     activity.startActivityForResult(intent, reqCode);
+                } else {
+                    activity.startActivity(intent);
                 }
             } else {
                 throwParamException(this.getClass().getName(), missParamName);

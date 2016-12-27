@@ -7,29 +7,23 @@ import android.content.SharedPreferences;
  * Created by admin on 2016/12/26.
  */
 
-public abstract class ManageSharedPre {
+public class ManageSharedPre {
 
+    private final SharedPreferences sp;
 
-    private final String fileName;
-    private Context context;
-
-    public ManageSharedPre(Context context, String fileName) {
-        this.context = context;
-        this.fileName = fileName;
+    public ManageSharedPre(Context context, EnumSpName fileName) {
+        sp = getSp(context, fileName.name());
     }
 
-    public boolean getBooble(String key, boolean defValue) {
-        return getSp().getBoolean(key, defValue);
+    public boolean getBoolean(String key, boolean defValue) {
+        return sp.getBoolean(key, defValue);
     }
 
-    public void setBooble(String key, boolean isTrue) {
-        getSp()
-                .edit()
-                .putBoolean(key, isTrue)
-                .apply();
+    public void setBoolean(String key, boolean isTrue) {
+        sp.edit().putBoolean(key, isTrue).apply();
     }
 
-    private SharedPreferences getSp() {
+    private SharedPreferences getSp(Context context, String fileName) {
         return context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
     }
 
