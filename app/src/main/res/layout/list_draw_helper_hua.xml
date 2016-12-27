@@ -1,6 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tv_hua_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="画的名字"
+        android:textSize="@dimen/font_size_big"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_hua_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="状态：已完成" />
+
+    <TextView
+        android:id="@+id/tv_min_left_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="时间"
+        android:textSize="@dimen/font_size_mini" />
+
+    <LinearLayout
+        android:id="@+id/ll_hua_time_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_hua_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="编辑"
+            android:textSize="@dimen/font_size_mini" />
+
+        <Button
+            android:id="@+id/btn_hua_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="删除"
+            android:textSize="@dimen/font_size_mini" />
+
+        <Button
+            android:id="@+id/btn_hua_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="已完成"
+            android:textSize="@dimen/font_size_mini" />
+
+    </LinearLayout>
+
 
 </LinearLayout>

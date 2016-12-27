@@ -13,29 +13,19 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 
 public class AcHome extends BaseActivity {
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_ac_home);
-//
-////        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "hua-db");
-////        SQLiteDatabase db = helper.getWritableDatabase();
-////        DaoMaster master = new DaoMaster(db);
-////        DaoSession session = master.newSession();
-////
-////        HuaDao huaDao = session.getHuaDao();
-////
-////        List<Hua> huaList = huaDao.loadAll();
-//
-//    }
 
     @InjectView(R.id.cb_launch_param_full)
     CheckBox cbParamFull;
 
     @Override
-    protected void initView(Bundle savedInstanceState) {
+    protected boolean initView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_ac_home);
+        return true;
+    }
+
+    @Override
+    protected void afterViewInject(Bundle savedInstanceState) {
+
     }
 
     @Override
@@ -49,13 +39,14 @@ public class AcHome extends BaseActivity {
     }
 
     @OnClick({R.id.btn_activity_launcher})
-    void clickAcLauncher() {
+    void clickAcLauncher(View view) {
         AcLaunchTest.PreLauncher preLauncher = new AcLaunchTest.PreLauncher(this);
         preLauncher.test1(1).test2("2");
         if (cbParamFull.isChecked()) {
             preLauncher.test3(new TestEntity());
         }
         preLauncher.start();
+//        UtilMessage.showToast(this, "clickAcLauncher");
     }
 
     @OnClick(R.id.btn_double_progress_bar)
@@ -65,7 +56,8 @@ public class AcHome extends BaseActivity {
 
     @OnClick(R.id.btn_draw_helper)
     void clickDrawHelper(View view) {
-        UtilMessage.showToast(this, "clickDrawHelper");
+        new AcDrawHelper.PreLauncher(this).start();
+//        UtilMessage.showToast(this, "clickDrawHelper");
     }
 
 }

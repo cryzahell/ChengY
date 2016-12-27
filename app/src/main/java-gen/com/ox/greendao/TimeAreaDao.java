@@ -13,7 +13,7 @@ import org.greenrobot.greendao.database.DatabaseStatement;
 /** 
  * DAO for table "TIME_AREA".
 */
-public class TimeAreaDao extends AbstractDao<TimeArea, Void> {
+public class TimeAreaDao extends AbstractDao<TimeArea, Long> {
 
     public static final String TABLENAME = "TIME_AREA";
 
@@ -22,8 +22,10 @@ public class TimeAreaDao extends AbstractDao<TimeArea, Void> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property StartTime = new Property(0, long.class, "startTime", false, "START_TIME");
-        public final static Property EndTime = new Property(1, long.class, "endTime", false, "END_TIME");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property HuaId = new Property(1, Long.class, "huaId", false, "HUA_ID");
+        public final static Property StartTime = new Property(2, long.class, "startTime", false, "START_TIME");
+        public final static Property EndTime = new Property(3, long.class, "endTime", false, "END_TIME");
     }
 
 
@@ -39,8 +41,10 @@ public class TimeAreaDao extends AbstractDao<TimeArea, Void> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"TIME_AREA\" (" + //
-                "\"START_TIME\" INTEGER NOT NULL ," + // 0: startTime
-                "\"END_TIME\" INTEGER NOT NULL );"); // 1: endTime
+                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"HUA_ID\" INTEGER," + // 1: huaId
+                "\"START_TIME\" INTEGER NOT NULL ," + // 2: startTime
+                "\"END_TIME\" INTEGER NOT NULL );"); // 3: endTime
     }
 
     /** Drops the underlying database table. */
@@ -52,52 +56,79 @@ public class TimeAreaDao extends AbstractDao<TimeArea, Void> {
     @Override
     protected final void bindValues(DatabaseStatement stmt, TimeArea entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getStartTime());
-        stmt.bindLong(2, entity.getEndTime());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
+ 
+        Long huaId = entity.getHuaId();
+        if (huaId != null) {
+            stmt.bindLong(2, huaId);
+        }
+        stmt.bindLong(3, entity.getStartTime());
+        stmt.bindLong(4, entity.getEndTime());
     }
 
     @Override
     protected final void bindValues(SQLiteStatement stmt, TimeArea entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getStartTime());
-        stmt.bindLong(2, entity.getEndTime());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
+ 
+        Long huaId = entity.getHuaId();
+        if (huaId != null) {
+            stmt.bindLong(2, huaId);
+        }
+        stmt.bindLong(3, entity.getStartTime());
+        stmt.bindLong(4, entity.getEndTime());
     }
 
     @Override
-    public Void readKey(Cursor cursor, int offset) {
-        return null;
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public TimeArea readEntity(Cursor cursor, int offset) {
         TimeArea entity = new TimeArea( //
-            cursor.getLong(offset + 0), // startTime
-            cursor.getLong(offset + 1) // endTime
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // huaId
+            cursor.getLong(offset + 2), // startTime
+            cursor.getLong(offset + 3) // endTime
         );
         return entity;
     }
      
     @Override
     public void readEntity(Cursor cursor, TimeArea entity, int offset) {
-        entity.setStartTime(cursor.getLong(offset + 0));
-        entity.setEndTime(cursor.getLong(offset + 1));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setHuaId(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
+        entity.setStartTime(cursor.getLong(offset + 2));
+        entity.setEndTime(cursor.getLong(offset + 3));
      }
     
     @Override
-    protected final Void updateKeyAfterInsert(TimeArea entity, long rowId) {
-        // Unsupported or missing PK type
-        return null;
+    protected final Long updateKeyAfterInsert(TimeArea entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     @Override
-    public Void getKey(TimeArea entity) {
-        return null;
+    public Long getKey(TimeArea entity) {
+        if(entity != null) {
+            return entity.getId();
+        } else {
+            return null;
+        }
     }
 
     @Override
     public boolean hasKey(TimeArea entity) {
-        // TODO
-        return false;
+        return entity.getId() != null;
     }
 
     @Override

@@ -27,5 +27,4 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':mylibrary')
-    compile 'org.greenrobot:greendao:3.2.0'
 }

@@ -9,6 +9,10 @@ import org.greenrobot.greendao.annotation.*;
  */
 @Entity
 public class TimeArea {
+
+    @Id
+    private Long id;
+    private Long huaId;
     private long startTime;
     private long endTime;
 
@@ -16,10 +20,32 @@ public class TimeArea {
     public TimeArea() {
     }
 
+    public TimeArea(Long id) {
+        this.id = id;
+    }
+
     @Generated
-    public TimeArea(long startTime, long endTime) {
+    public TimeArea(Long id, Long huaId, long startTime, long endTime) {
+        this.id = id;
+        this.huaId = huaId;
         this.startTime = startTime;
         this.endTime = endTime;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getHuaId() {
+        return huaId;
+    }
+
+    public void setHuaId(Long huaId) {
+        this.huaId = huaId;
     }
 
     public long getStartTime() {
