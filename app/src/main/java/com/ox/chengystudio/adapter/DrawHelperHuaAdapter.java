@@ -108,7 +108,7 @@ public class DrawHelperHuaAdapter extends BaseListAdapter<Hua> {
         holder.listTimeArea = timeList;
         holder.llTimeContainer.removeAllViews();
         if (!UtilCollection.isEmpty(timeList)) {
-            long minLeftMillis = -1;
+            long minLeftMillis = Long.MAX_VALUE;
             Calendar calCur = Calendar.getInstance();
             for (TimeArea timeArea : timeList) {
                 TextView tvTime = (TextView) mInflater.inflate(R.layout.simple_text, null);
@@ -118,6 +118,9 @@ public class DrawHelperHuaAdapter extends BaseListAdapter<Hua> {
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH : mm");
                 Long millisStart = getMillisInToday(calCur, timeArea.getStartTime());
                 Long millisEnd = getMillisInToday(calCur, timeArea.getEndTime());
+                if (millisStart < calCur.getTimeInMillis()) {
+                    millisStart += DateUtils.DAY_IN_MILLIS;
+                }
                 if (millisEnd < millisStart) {
                     millisEnd += DateUtils.DAY_IN_MILLIS;
                 }
@@ -128,7 +131,12 @@ public class DrawHelperHuaAdapter extends BaseListAdapter<Hua> {
                                 dateFormat.format(new Date(millisEnd))
                         )
                 );
-                if (minLeftMillis < 0 && timeArea.getStartTime() > 0 && millisStart > calCur.getTimeInMillis()) {
+                if (millisStart - calCur.getTimeInMillis() < minLeftMillis && timeArea.getStartTime() > 0 && millisStart > calCur.getTimeInMillis()) {
+                    for (int i = 0; i < holder.llTimeContainer.getChildCount(); i++) {
+                        ((TextView) holder.llTimeContainer.getChildAt(i)).setTextColor(
+                                mActivity.getResources().getColor(R.color.colorFontGray)
+                        );
+                    }
                     tvTime.setTextColor(mActivity.getResources().getColor(R.color.colorFontGreen));
                     minLeftMillis = millisStart - calCur.getTimeInMillis();
                     holder.tvMinLeftTime.setText(
@@ -150,12 +158,16 @@ public class DrawHelperHuaAdapter extends BaseListAdapter<Hua> {
 
     @NonNull
     private Long getMillisInToday(Calendar calCur, Long millis) {
-        Calendar calStart = Calendar.getInstance();
-        calStart.setTimeInMillis(millis);
-        calStart.set(Calendar.YEAR, calCur.get(Calendar.YEAR));
-        calStart.set(Calendar.MONTH, calCur.get(Calendar.MONTH));
-        calStart.set(Calendar.DAY_OF_MONTH, calCur.get(Calendar.DAY_OF_MONTH));
-        return calStart.getTimeInMillis();
+//        Calendar calStart = Calendar.getInstance();
+//        calStart.setTimeInMillis(millis);
+//        calStart.set(Calendar.YEAR, calCur.get(Calendar.YEAR));
+//        calStart.set(Calendar.MONTH, calCur.get(Calendar.MONTH));
+//        calStart.set(Calendar.DAY_OF_MONTH, calCur.get(Calendar.DAY_OF_MONTH));
+        Calendar calTemp = Calendar.getInstance();
+        calTemp.set(Calendar.HOUR_OF_DAY, (int) (millis / DateUtils.HOUR_IN_MILLIS));
+        calTemp.set(Calendar.MINUTE, (int) (millis % DateUtils.HOUR_IN_MILLIS / DateUtils.MINUTE_IN_MILLIS));
+        calTemp.set(Calendar.SECOND, 0);
+        return calTemp.getTimeInMillis();
     }
 
     class HuaVH extends BaseViewHolder<Hua> {
