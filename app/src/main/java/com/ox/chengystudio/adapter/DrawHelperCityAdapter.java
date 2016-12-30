@@ -89,6 +89,11 @@ public class DrawHelperCityAdapter extends BaseListAdapter<City> {
         firstInInit(position, city);
         //处理右边线
         treatRightLine(position, holder);
+        if (position == selectPosition) {
+            holder.tvCityDelete.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvCityDelete.setVisibility(View.GONE);
+        }
         return convertView;
     }
 
@@ -113,8 +118,8 @@ public class DrawHelperCityAdapter extends BaseListAdapter<City> {
 
         @InjectView(R.id.tv_city_name)
         TextView tvCityName;
-        @InjectView(R.id.btn_city_delete)
-        Button btnCityDelete;
+        @InjectView(R.id.tv_city_delete)
+        TextView tvCityDelete;
         @InjectView(R.id.view_right_line)
         View viewRightLine;
 
@@ -132,7 +137,7 @@ public class DrawHelperCityAdapter extends BaseListAdapter<City> {
             }
         }
 
-        @OnClick(R.id.btn_city_delete)
+        @OnClick(R.id.tv_city_delete)
         void clickCityDelete(View view) {
             if (onCityClickListener != null) {
                 onCityClickListener.onCityDelete(entity);

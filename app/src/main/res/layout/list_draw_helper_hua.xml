@@ -3,7 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:paddingBottom="10dp"
+    android:paddingLeft="10dp"
+    android:paddingTop="10dp">
 
     <TextView
         android:id="@+id/tv_hua_name"
@@ -20,8 +22,8 @@
         android:layout_marginTop="5dp"
         android:text="状态：已完成" />
 
-    <TextView
-        android:id="@+id/tv_min_left_time"
+    <com.ox.chengystudio.custom.AutoRefreshTextView
+        android:id="@+id/tv_refresh_min_left_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -37,26 +39,37 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btn_hua_update"
+        <View style="@style/Style.PlaceHolder" />
+
+        <TextView
+            android:id="@+id/tv_hua_update"
             android:layout_width="wrap_content"
+            android:layout_marginRight="8dp"
             android:layout_height="wrap_content"
+            android:background="@drawable/slt_home_btn"
+            android:padding="8dp"
             android:text="编辑"
             android:textSize="@dimen/font_size_mini" />
 
-        <Button
-            android:id="@+id/btn_hua_delete"
+        <TextView
+            android:id="@+id/tv_hua_delete"
             android:layout_width="wrap_content"
+            android:layout_marginRight="8dp"
             android:layout_height="wrap_content"
+            android:background="@drawable/slt_home_btn"
+            android:padding="8dp"
             android:text="删除"
             android:textSize="@dimen/font_size_mini" />
 
-        <Button
-            android:id="@+id/btn_hua_done"
+        <TextView
+            android:id="@+id/tv_hua_done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/slt_home_btn"
+            android:padding="8dp"
             android:text="已完成"
             android:textSize="@dimen/font_size_mini" />
 

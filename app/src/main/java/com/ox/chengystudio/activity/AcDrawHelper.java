@@ -2,9 +2,9 @@ package com.ox.chengystudio.activity;
 
 import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.WindowManager;
 import android.widget.ListView;
 
 import com.ox.chengystudio.R;
@@ -12,8 +12,11 @@ import com.ox.chengystudio.adapter.DrawHelperCityAdapter;
 import com.ox.chengystudio.adapter.DrawHelperHuaAdapter;
 import com.ox.chengystudio.base.BaseActivity;
 import com.ox.chengystudio.callback.OnCityClickListener;
+import com.ox.chengystudio.callback.OnHuaClickListener;
 import com.ox.chengystudio.callback.OnHuaSaveListener;
 import com.ox.chengystudio.decor.DecorUpdateHua;
+import com.ox.chengystudio.ioc.OO;
+import com.ox.chengystudio.ioc.OO_resColor;
 import com.ox.greendao.City;
 import com.ox.greendao.CityDao;
 import com.ox.greendao.DaoMaster;
@@ -52,24 +55,43 @@ public class AcDrawHelper extends BaseActivity {
     private DrawHelperHuaAdapter huaAdapter;
     private City curCity;
 
+    @OO_resColor(R.color.colorUnderLine)
+    int colorUnderline;
+
     @Override
     protected boolean initView(Bundle savedInstanceState) {
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_ac_draw_helper);
         return true;
     }
 
     @Override
     protected void afterViewInject(Bundle savedInstanceState) {
+        OO.inject(mActivity, this);
         initDAO();
 
+        setDivider(lvCity);
         cityAdapter = new DrawHelperCityAdapter(this);
         cityAdapter.setOnCityClickListener(new MyOnCityClickListener());
         lvCity.setAdapter(cityAdapter);
 
+        setDivider(lvHua);
         huaAdapter = new DrawHelperHuaAdapter(this, timeAreaDao);
         huaAdapter.setOnHuaClickListener(new MyOnHuaClickListener());
         lvHua.setAdapter(huaAdapter);
+
+
+    }
+
+    private void setDivider(ListView lv) {
+        lv.setDivider(new ColorDrawable(colorUnderline));
+        int dh = getResources().getDimensionPixelSize(R.dimen.height_underline);
+        lv.setDividerHeight(dh);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        huaAdapter.recycle();
     }
 
     @Override
@@ -212,7 +234,7 @@ public class AcDrawHelper extends BaseActivity {
         }
     }
 
-    private class MyOnHuaClickListener implements DrawHelperHuaAdapter.OnHuaClickListener {
+    private class MyOnHuaClickListener implements OnHuaClickListener {
         @Override
         public void onHuaAdd() {
             DecorUpdateHua.addHua(mActivity, new MyOnHuaSaveListener());

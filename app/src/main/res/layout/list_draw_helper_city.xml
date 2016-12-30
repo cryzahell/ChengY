@@ -13,20 +13,26 @@
 
         <TextView
             android:id="@+id/tv_city_name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
+            android:gravity="center"
             android:layout_height="wrap_content"
             android:paddingBottom="15dp"
+            android:text="杭州"
             android:paddingTop="15dp"
             android:textColor="@color/colorFontGreen"
             android:textSize="@dimen/font_size_small" />
 
-        <Button
-            android:id="@+id/btn_city_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/tv_city_delete"
             android:text="删除"
-            android:textColor="@color/colorFontGray"
-            android:textSize="@dimen/font_size_small" />
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="15dp"
+            android:background="@drawable/slt_home_btn"
+            android:padding="3dp"
+            android:textColor="@color/colorFontRed"
+            android:textSize="@dimen/font_size_mini" />
 
     </LinearLayout>
 

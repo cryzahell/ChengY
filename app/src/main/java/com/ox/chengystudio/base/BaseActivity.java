@@ -16,6 +16,7 @@ import butterknife.ButterKnife;
 public abstract class BaseActivity extends AppCompatActivity {
 
     protected BaseActivity mActivity;
+    public boolean isDestroyed;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -24,6 +25,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         view(savedInstanceState);
         initData(savedInstanceState);
         initOther(savedInstanceState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        isDestroyed = true;
     }
 
     /**

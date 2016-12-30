@@ -14,6 +14,10 @@ import android.widget.TextView;
 import com.ox.chengystudio.R;
 import com.ox.chengystudio.base.BaseListAdapter;
 import com.ox.chengystudio.base.BaseViewHolder;
+import com.ox.chengystudio.callback.OnHuaClickListener;
+import com.ox.chengystudio.custom.AutoRefreshTextView;
+import com.ox.chengystudio.ioc.OO;
+import com.ox.chengystudio.ioc.OO_resColor;
 import com.ox.greendao.Hua;
 import com.ox.greendao.TimeArea;
 import com.ox.greendao.TimeAreaDao;
@@ -22,10 +26,12 @@ import com.ox.mylibrary.util.UtilCollection;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -39,18 +45,31 @@ public class DrawHelperHuaAdapter extends BaseListAdapter<Hua> {
     private static final int ITEM_VIEW_TYPE_HUA = 0;
     private static final int ITEM_VIEW_TYPE_ADD = 1;
     private final TimeAreaDao timeAreaDao;
+    private final ExecutorService es;
+
+    @OO_resColor(R.color.colorFontGray)
+    int colorFontGray;
+    @OO_resColor(R.color.colorFontGreen)
+    int colorFontGreen;
+    @OO_resColor(R.color.colorFontRed)
+    int colorFontRed;
 
     private OnHuaClickListener onHuaClickListener;
-
-    public void setOnHuaClickListener(OnHuaClickListener onHuaClickListener) {
-        this.onHuaClickListener = onHuaClickListener;
-    }
 
     public DrawHelperHuaAdapter(Activity activity, TimeAreaDao timeAreaDao) {
         super(activity);
         this.timeAreaDao = timeAreaDao;
+        es = Executors.newFixedThreadPool(4);
+        OO.inject(mActivity, this);
     }
 
+    public void recycle() {
+        es.shutdown();
+    }
+
+    public void setOnHuaClickListener(OnHuaClickListener onHuaClickListener) {
+        this.onHuaClickListener = onHuaClickListener;
+    }
 
     @Override
     public int getViewTypeCount() {
@@ -91,21 +110,34 @@ public class DrawHelperHuaAdapter extends BaseListAdapter<Hua> {
             convertView.setTag(holder);
         }
         Hua hua = getItem(position);
-        HuaVH holder = (HuaVH) convertView.getTag();
+        final HuaVH holder = (HuaVH) convertView.getTag();
         holder.entity = hua;
-        holder.tvHuaName.setText(hua.getName());
-        if (hua.getHasDrawn()) {
-            holder.tvHuaStatus.setTextColor(mActivity.getResources().getColor(R.color.colorFontGray));
-            holder.tvHuaStatus.setText(MessageFormat.format("状态:{0}", "已完成"));
-        } else {
-            holder.tvHuaStatus.setTextColor(mActivity.getResources().getColor(R.color.colorFontGreen));
-            holder.tvHuaStatus.setText(MessageFormat.format("状态：{0}", "未完成"));
-        }
-        List<TimeArea> timeList = timeAreaDao.queryBuilder()
+        bindViews(hua, holder);
+        List<TimeArea> timeList = queryTimeAreas(hua);
+        holder.listTimeArea = timeList;
+        addTimeViews(holder, timeList);
+        return convertView;
+    }
+
+    private List<TimeArea> queryTimeAreas(Hua hua) {
+        return timeAreaDao.queryBuilder()
                 .where(TimeAreaDao.Properties.HuaId.eq(hua.getId()))
                 .orderAsc(TimeAreaDao.Properties.StartTime)
                 .list();
-        holder.listTimeArea = timeList;
+    }
+
+    private void bindViews(Hua hua, HuaVH holder) {
+        holder.tvHuaName.setText(hua.getName());
+        if (hua.getHasDrawn()) {
+            holder.tvHuaStatus.setTextColor(colorFontGray);
+            holder.tvHuaStatus.setText(MessageFormat.format("状态:{0}", "已完成"));
+        } else {
+            holder.tvHuaStatus.setTextColor(colorFontGreen);
+            holder.tvHuaStatus.setText(MessageFormat.format("状态：{0}", "未完成"));
+        }
+    }
+
+    private void addTimeViews(HuaVH holder, List<TimeArea> timeList) {
         holder.llTimeContainer.removeAllViews();
         if (!UtilCollection.isEmpty(timeList)) {
             long minLeftMillis = Long.MAX_VALUE;
@@ -113,15 +145,15 @@ public class DrawHelperHuaAdapter extends BaseListAdapter<Hua> {
             for (TimeArea timeArea : timeList) {
                 TextView tvTime = (TextView) mInflater.inflate(R.layout.simple_text, null);
                 tvTime.setTextSize(12);
-                tvTime.setTextColor(mActivity.getResources().getColor(R.color.colorFontGray));
+                tvTime.setTextColor(colorFontGray);
                 holder.llTimeContainer.addView(tvTime);
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH : mm");
-                Long millisStart = getMillisInToday(calCur, timeArea.getStartTime());
-                Long millisEnd = getMillisInToday(calCur, timeArea.getEndTime());
-                if (millisStart < calCur.getTimeInMillis()) {
+                DateFormat dateFormat = new SimpleDateFormat("MM-dd HH : mm");
+                Long millisStart = getMillisInToday(timeArea.getStartTime());
+                Long millisEnd = getMillisInToday(timeArea.getEndTime());
+                if (timeArea.getStartTime() > 0 && millisStart < calCur.getTimeInMillis()) {
                     millisStart += DateUtils.DAY_IN_MILLIS;
                 }
-                if (millisEnd < millisStart) {
+                if (timeArea.getEndTime() > 0 && millisEnd < millisStart) {
                     millisEnd += DateUtils.DAY_IN_MILLIS;
                 }
                 tvTime.setText(
@@ -131,38 +163,54 @@ public class DrawHelperHuaAdapter extends BaseListAdapter<Hua> {
                                 dateFormat.format(new Date(millisEnd))
                         )
                 );
-                if (millisStart - calCur.getTimeInMillis() < minLeftMillis && timeArea.getStartTime() > 0 && millisStart > calCur.getTimeInMillis()) {
-                    for (int i = 0; i < holder.llTimeContainer.getChildCount(); i++) {
-                        ((TextView) holder.llTimeContainer.getChildAt(i)).setTextColor(
-                                mActivity.getResources().getColor(R.color.colorFontGray)
-                        );
-                    }
-                    tvTime.setTextColor(mActivity.getResources().getColor(R.color.colorFontGreen));
-                    minLeftMillis = millisStart - calCur.getTimeInMillis();
-                    holder.tvMinLeftTime.setText(
-                            MessageFormat.format(
-                                    "时间（离现在最近还有： {0}）",
-                                    new SimpleDateFormat("HH : mm : ss").format(new Date(minLeftMillis))
-                            )
-                    );
-                    if (DateUtils.HOUR_IN_MILLIS > minLeftMillis) {
-                        holder.tvMinLeftTime.setTextColor(mActivity.getResources().getColor(R.color.colorFontRed));
-                    } else {
-                        holder.tvMinLeftTime.setTextColor(mActivity.getResources().getColor(R.color.colorFontGray));
-                    }
+                long tempLeftMillis = millisStart - calCur.getTimeInMillis();
+                if (tempLeftMillis > 0 && tempLeftMillis < minLeftMillis
+                        && timeArea.getStartTime() > 0 && millisStart > calCur.getTimeInMillis()) {
+                    setTvTextColorGray(holder.llTimeContainer);
+                    tvTime.setTextColor(colorFontGreen);
+                    minLeftMillis = calculateLeftMillis(millisStart);
+                    startToRefresh(holder.tvRefreshMinLeftTime, millisStart);
                 }
             }
         }
-        return convertView;
+    }
+
+    private void setTvTextColorGray(ViewGroup tvContainer) {
+        for (int i = 0; i < tvContainer.getChildCount(); i++) {
+            ((TextView) tvContainer.getChildAt(i)).setTextColor(
+                    mActivity.getResources().getColor(R.color.colorFontGray)
+            );
+        }
+    }
+
+    private void startToRefresh(AutoRefreshTextView autoRefreshTextView, final long millisStart) {
+        autoRefreshTextView.startToRefresh(es, new AutoRefreshTextView.TextPicker() {
+            @Override
+            public String getText(TextView textView) {
+                long minLeft = calculateLeftMillis(millisStart);
+                textView.setTextColor(colorFontGray);
+                Calendar calTemp = Calendar.getInstance();
+                calTemp.setTimeInMillis(minLeft);
+                int hour = calTemp.get(Calendar.HOUR_OF_DAY);
+                if (hour > 0) {
+                    textView.setTextColor(colorFontGray);
+                } else {
+                    textView.setTextColor(colorFontRed);
+                }
+                return MessageFormat.format(
+                        "时间（离现在最近还有： {0}）",
+                        new SimpleDateFormat("HH : mm : ss").format(new Date(minLeft))
+                );
+            }
+        });
+    }
+
+    private long calculateLeftMillis(Long millisStart) {
+        return millisStart - Calendar.getInstance().getTimeInMillis() - TimeZone.getDefault().getRawOffset();
     }
 
     @NonNull
-    private Long getMillisInToday(Calendar calCur, Long millis) {
-//        Calendar calStart = Calendar.getInstance();
-//        calStart.setTimeInMillis(millis);
-//        calStart.set(Calendar.YEAR, calCur.get(Calendar.YEAR));
-//        calStart.set(Calendar.MONTH, calCur.get(Calendar.MONTH));
-//        calStart.set(Calendar.DAY_OF_MONTH, calCur.get(Calendar.DAY_OF_MONTH));
+    private Long getMillisInToday(Long millis) {
         Calendar calTemp = Calendar.getInstance();
         calTemp.set(Calendar.HOUR_OF_DAY, (int) (millis / DateUtils.HOUR_IN_MILLIS));
         calTemp.set(Calendar.MINUTE, (int) (millis % DateUtils.HOUR_IN_MILLIS / DateUtils.MINUTE_IN_MILLIS));
@@ -176,16 +224,16 @@ public class DrawHelperHuaAdapter extends BaseListAdapter<Hua> {
         TextView tvHuaName;
         @InjectView(R.id.tv_hua_status)
         TextView tvHuaStatus;
-        @InjectView(R.id.tv_min_left_time)
-        TextView tvMinLeftTime;
+        @InjectView(R.id.tv_refresh_min_left_time)
+        AutoRefreshTextView tvRefreshMinLeftTime;
         @InjectView(R.id.ll_hua_time_container)
         LinearLayout llTimeContainer;
-        @InjectView(R.id.btn_hua_update)
-        Button btnHuaUpdate;
-        @InjectView(R.id.btn_hua_delete)
-        Button btnHuaDelete;
-        @InjectView(R.id.btn_hua_done)
-        Button btnHuaDone;
+        @InjectView(R.id.tv_hua_update)
+        TextView tvHuaUpdate;
+        @InjectView(R.id.tv_hua_delete)
+        TextView tvHuaDelete;
+        @InjectView(R.id.tv_hua_done)
+        TextView tvHuaDone;
 
         List<TimeArea> listTimeArea;
 
@@ -194,21 +242,21 @@ public class DrawHelperHuaAdapter extends BaseListAdapter<Hua> {
             ButterKnife.inject(this, itemView);
         }
 
-        @OnClick(R.id.btn_hua_update)
+        @OnClick(R.id.tv_hua_update)
         void clickUpdate(View view) {
             if (onHuaClickListener != null) {
                 onHuaClickListener.onHuaUpdate(entity, listTimeArea);
             }
         }
 
-        @OnClick(R.id.btn_hua_delete)
+        @OnClick(R.id.tv_hua_delete)
         void clickDelete(View view) {
             if (onHuaClickListener != null) {
                 onHuaClickListener.onHuaDelete(entity);
             }
         }
 
-        @OnClick(R.id.btn_hua_done)
+        @OnClick(R.id.tv_hua_done)
         void clickHuaDone(View view) {
             if (onHuaClickListener != null) {
                 entity.setHasDrawn(true);
@@ -216,16 +264,6 @@ public class DrawHelperHuaAdapter extends BaseListAdapter<Hua> {
             }
         }
 
-    }
-
-    public interface OnHuaClickListener {
-        void onHuaAdd();
-
-        void onHuaUpdate(Hua hua, List<TimeArea> listTimeArea);
-
-        void onHuaDelete(Hua hua);
-
-        void onHuaHasDrawn(Hua hua);
     }
 
     class AddVH extends BaseViewHolder<Hua> {
