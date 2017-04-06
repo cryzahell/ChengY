@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/btn_hua_add"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="添加"
+        android:textColor="@color/colorFontGray"
+        android:textSize="@dimen/font_size_normal" />
+
+    <CheckBox
+        android:id="@+id/cb_hua_show_done"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="显示已完成"
+        android:textColor="@color/colorFontGray"
+        android:textSize="@dimen/font_size_normal" />
+
+    <CheckBox
+        android:id="@+id/cb_hua_sort_by_time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="按时间排序"
+        android:textColor="@color/colorFontGray"
+        android:textSize="@dimen/font_size_normal" />
+
+
+</LinearLayout>

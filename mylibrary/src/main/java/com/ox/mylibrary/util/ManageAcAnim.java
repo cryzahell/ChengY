@@ -8,11 +8,11 @@ import android.app.Activity;
 
 public class ManageAcAnim {
 
-    public static void leftInRightOut(Activity activity) {
+    public static void fadeInFadeOut(Activity activity) {
         if (activity != null) {
             activity.overridePendingTransition(
-                    android.R.anim.slide_in_left,
-                    android.R.anim.slide_out_right
+                    android.R.anim.fade_in,
+                    android.R.anim.fade_out
             );
         }
     }

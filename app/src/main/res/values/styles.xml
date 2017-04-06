@@ -16,9 +16,27 @@
         <item name="android:background">@color/colorUnderLine</item>
     </style>
 
+    <style name="Style.Underline_vertical">
+        <item name="android:layout_width">@dimen/height_underline</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@color/colorUnderLine</item>
+    </style>
+
     <style name="Style.Underline.LRMargin15">
         <item name="android:layout_marginLeft">15dp</item>
         <item name="android:layout_marginRight">15dp</item>
+    </style>
+
+    <style name="Style.PlaceHolder">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">1dp</item>
+    </style>
+
+    <style name="Style.PlaceHolder_vertical">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">0dp</item>
     </style>
 
     <style name="Style.HomeButton">
@@ -32,7 +50,7 @@
         <item name="android:layout_marginRight">15dp</item>
         <item name="android:gravity">center</item>
         <item name="android:background">@drawable/slt_home_btn</item>
-        <item name="android:textSize">15sp</item>
+        <item name="android:textSize">@dimen/font_size_normal</item>
         <item name="android:textColor">@color/colorFontGray</item>
     </style>
 
